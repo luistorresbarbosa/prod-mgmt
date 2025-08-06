@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009"
                xmlns:s="library://ns.adobe.com/flex/spark"
                xmlns:mx="library://ns.adobe.com/flex/mx"
                backgroundColor="#F8F9FB"
@@ -9,9 +9,9 @@
         <!-- define data models -->
         <s:ArrayCollection id="orders">
             <fx:Object po="PO‑001" qty="1000" machine="M‑XYZ‑001" operator="John Doe"
-                       start="08:00 AM" end="-" status="IN PROGRESS"/>
+                       start="08:00 AM" end="-" status="IN PROGRESS" progress="45%"/>
             <fx:Object po="PO‑002" qty="500" machine="M‑ABC‑002" operator="Jane Smith"
-                       start="07:30 AM" end="11:00 AM" status="COMPLETED"/>
+                       start="07:30 AM" end="11:00 AM" status="COMPLETED" progress="100%"/>
             <!-- add more rows as needed -->
         </s:ArrayCollection>
         <s:ArrayCollection id="machines">
@@ -20,7 +20,19 @@
             <fx:String>M‑ABC‑002</fx:String>
             <fx:String>M‑DEF‑003</fx:String>
         </s:ArrayCollection>
-        <!-- similar arrays for operators/statuses -->
+        <s:ArrayCollection id="operators">
+            <fx:String>All Operators</fx:String>
+            <fx:String>John Doe</fx:String>
+            <fx:String>Jane Smith</fx:String>
+            <fx:String>Michael Brown</fx:String>
+        </s:ArrayCollection>
+        <s:ArrayCollection id="statuses">
+            <fx:String>All Statuses</fx:String>
+            <fx:String>PENDING</fx:String>
+            <fx:String>IN PROGRESS</fx:String>
+            <fx:String>COMPLETED</fx:String>
+            <fx:String>ON HOLD</fx:String>
+        </s:ArrayCollection>
     </fx:Declarations>
 
     <!-- Global styles -->
@@ -105,7 +117,9 @@
                              dropShadowVisible="true" cornerRadius="8">
                         <s:DataGrid id="ordersGrid" dataProvider="{orders}" width="100%" height="100%"
                                     alternatingRowColors="[0xFFFFFF, 0xF7FAFC]"
-                                    selectionMode="singleRow">
+                                    selectionMode="singleRow"
+                                    selectedIndex="0"
+                                    selectionChange="ordersGrid_selectionChange(event)">
                             <s:columns>
                                 <s:ArrayCollection>
                                     <s:GridColumn dataField="po"   headerText="PO#" />
@@ -204,7 +218,7 @@
         import spark.events.GridSelectionEvent;
         import mx.collections.ArrayCollection;
 
-        [Bindable] private var selectedOrder:Object = {};
+        [Bindable] private var selectedOrder:Object = orders.getItemAt(0);
 
         protected function handleAssign(order:Object):void {
             // TODO: implement assignment logic
@@ -215,4 +229,4 @@
         }
         ]]>
     </fx:Script>
-</s:Application>
+</s:View>
