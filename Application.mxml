@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:s="library://ns.adobe.com/flex/spark"
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+               backgroundColor="#F8F9FB"
+               minWidth="1024" minHeight="600">
+
+    <fx:Declarations>
+        <!-- define data models -->
+        <s:ArrayCollection id="orders">
+            <fx:Object po="PO‑001" qty="1000" machine="M‑XYZ‑001" operator="John Doe"
+                       start="08:00 AM" end="-" status="IN PROGRESS"/>
+            <fx:Object po="PO‑002" qty="500" machine="M‑ABC‑002" operator="Jane Smith"
+                       start="07:30 AM" end="11:00 AM" status="COMPLETED"/>
+            <!-- add more rows as needed -->
+        </s:ArrayCollection>
+        <s:ArrayCollection id="machines">
+            <fx:String>All Machines</fx:String>
+            <fx:String>M‑XYZ‑001</fx:String>
+            <fx:String>M‑ABC‑002</fx:String>
+            <fx:String>M‑DEF‑003</fx:String>
+        </s:ArrayCollection>
+        <!-- similar arrays for operators/statuses -->
+    </fx:Declarations>
+
+    <!-- Global styles -->
+    <fx:Style>
+        .navButton {
+            chromeColor: #0D1C2C;
+            color: #FFFFFF;
+            fontSize: 14;
+            paddingLeft: 10;
+            paddingRight: 10;
+        }
+        .navButton:hover {
+            chromeColor: #142F50;
+        }
+        .primaryButton {
+            chromeColor: #1E86FF;
+            color: #FFFFFF;
+            cornerRadius: 4;
+            fontWeight: bold;
+        }
+        .statusInProgress {
+            backgroundColor: #EAF4FF;
+            color: #2F80ED;
+            paddingLeft: 6;
+            paddingRight: 6;
+            cornerRadius: 4;
+        }
+        .statusCompleted {
+            backgroundColor: #EBF8EC;
+            color: #27AE60;
+            paddingLeft: 6;
+            paddingRight: 6;
+            cornerRadius: 4;
+        }
+        .statusPending {
+            backgroundColor: #F7F7F7;
+            color: #999999;
+            paddingLeft: 6;
+            paddingRight: 6;
+            cornerRadius: 4;
+        }
+        .statusOnHold {
+            backgroundColor: #FFF5EB;
+            color: #F2994A;
+            paddingLeft: 6;
+            paddingRight: 6;
+            cornerRadius: 4;
+        }
+    </fx:Style>
+
+    <s:Group width="100%" height="100%">
+        <!-- Sidebar -->
+        <s:VGroup width="200" height="100%" color="#FFFFFF" paddingTop="20" paddingLeft="12"
+                  backgroundColor="#0D1C2C">
+            <s:Label text="ProductionFlow" fontSize="20" color="#1E86FF" />
+            <s:Button label="Dashboard" styleName="navButton" width="100%" />
+            <s:Button label="Orders" styleName="navButton" width="100%" />
+            <s:Button label="Machines" styleName="navButton" width="100%" />
+            <s:Button label="Operators" styleName="navButton" width="100%" />
+            <s:Button label="Reports" styleName="navButton" width="100%" />
+            <s:Button label="Settings" styleName="navButton" width="100%" />
+        </s:VGroup>
+
+        <!-- Main panel -->
+        <s:VGroup width="100%" height="100%" paddingLeft="20" paddingRight="20"
+                  paddingTop="20" gap="10">
+            <s:Label text="Production Order Management" fontSize="24" fontWeight="bold" color="#0D1C2C"/>
+            <!-- Search and filter controls -->
+            <s:HGroup gap="10">
+                <s:TextInput prompt="Search PO#" width="160" />
+                <s:DropDownList dataProvider="{machines}" width="160" />
+                <s:DropDownList dataProvider="{operators}" prompt="All Operators" width="160" />
+                <s:DropDownList dataProvider="{statuses}" prompt="All Statuses" width="160" />
+                <s:Button label="Apply Filters" styleName="primaryButton" />
+            </s:HGroup>
+
+            <s:HGroup width="100%" height="100%" gap="20">
+                <!-- Left: Orders table -->
+                <s:VGroup width="65%" height="100%">
+                    <s:Panel title="Production Orders" width="100%" height="100%"
+                             backgroundColor="#FFFFFF" borderVisible="false"
+                             dropShadowVisible="true" cornerRadius="8">
+                        <s:DataGrid id="ordersGrid" dataProvider="{orders}" width="100%" height="100%"
+                                    alternatingRowColors="[0xFFFFFF, 0xF7FAFC]"
+                                    selectionMode="singleRow">
+                            <s:columns>
+                                <s:ArrayCollection>
+                                    <s:GridColumn dataField="po"   headerText="PO#" />
+                                    <s:GridColumn dataField="qty"  headerText="Planned Qty" />
+                                    <s:GridColumn dataField="machine" headerText="Machine Serial #" />
+                                    <s:GridColumn dataField="operator" headerText="Operator" />
+                                    <s:GridColumn dataField="start" headerText="Started" />
+                                    <s:GridColumn dataField="end"   headerText="Ended" />
+                                    <!-- Custom itemRenderer for Status column -->
+                                    <s:GridColumn headerText="Status">
+                                        <s:itemRenderer>
+                                            <fx:Component>
+                                                <s:GridItemRenderer>
+                                                    <s:Label id="statusLabel"
+                                                             text="{data.status}"
+                                                             includeInLayout="true"
+                                                             horizontalCenter="0"
+                                                             paddingLeft="0"
+                                                             paddingRight="0"
+                                                             styleName="{data.status == 'COMPLETED' ?
+                                                                         'statusCompleted' :
+                                                                         data.status == 'IN PROGRESS' ? 
+                                                                         'statusInProgress' :
+                                                                         data.status == 'PENDING' ?
+                                                                         'statusPending' :
+                                                                         'statusOnHold'}" />
+                                                </s:GridItemRenderer>
+                                            </fx:Component>
+                                        </s:itemRenderer>
+                                    </s:GridColumn>
+                                    <!-- Action column with button -->
+                                    <s:GridColumn headerText="Action">
+                                        <s:itemRenderer>
+                                            <fx:Component>
+                                                <s:GridItemRenderer>
+                                                    <s:Button label="Assign" styleName="primaryButton"
+                                                              click="outerDocument.handleAssign(data)" />
+                                                </s:GridItemRenderer>
+                                            </fx:Component>
+                                        </s:itemRenderer>
+                                    </s:GridColumn>
+                                </s:ArrayCollection>
+                            </s:columns>
+                        </s:DataGrid>
+                    </s:Panel>
+                </s:VGroup>
+
+                <!-- Right: Details and actions -->
+                <s:VGroup width="35%" height="100%" gap="10">
+                    <s:Panel title="Selected Order Details" width="100%" height="180"
+                             backgroundColor="#FFFFFF" dropShadowVisible="true" cornerRadius="8">
+                        <s:Form>
+                            <s:FormItem label="Machine:">
+                                <s:Label text="{selectedOrder.machine}" />
+                            </s:FormItem>
+                            <s:FormItem label="Operator:">
+                                <s:Label text="{selectedOrder.operator}" />
+                            </s:FormItem>
+                            <s:FormItem label="Current Status:">
+                                <s:Label text="{selectedOrder.status}" />
+                            </s:FormItem>
+                            <s:FormItem label="Progress:">
+                                <s:Label text="{selectedOrder.progress}" />
+                            </s:FormItem>
+                        </s:Form>
+                    </s:Panel>
+
+                    <s:Panel title="Operator Actions" width="100%" height="200"
+                             backgroundColor="#FFFFFF" dropShadowVisible="true" cornerRadius="8">
+                        <s:TileGroup columns="2" columnWidth="140" rowHeight="50" gap="10">
+                            <s:Button label="Cleaning" styleName="primaryButton" />
+                            <s:Button label="Consumption Reports" styleName="primaryButton" />
+                            <s:Button label="Incidents & Non‑conformities" styleName="primaryButton" />
+                            <!-- more buttons if needed -->
+                        </s:TileGroup>
+                    </s:Panel>
+
+                    <s:Panel title="Consultation Data" width="100%" height="200"
+                             backgroundColor="#FFFFFF" dropShadowVisible="true" cornerRadius="8">
+                        <s:TextArea text="• Verify material batch #XYZ\n• Machine calibration check ...\n• Refer to schematic S‑001 for ..." 
+                                    editable="false" 
+                                    width="100%" height="120"
+                                    backgroundColor="#F7FAFC"
+                                    borderVisible="false" />
+                        <s:Button label="View Documentation" styleName="primaryButton"
+                                  width="160" horizontalCenter="0" />
+                    </s:Panel>
+                </s:VGroup>
+            </s:HGroup>
+        </s:VGroup>
+    </s:Group>
+
+    <!-- Script for selection logic -->
+    <fx:Script>
+        <![CDATA[
+        import spark.events.GridSelectionEvent;
+        import mx.collections.ArrayCollection;
+
+        [Bindable] private var selectedOrder:Object = {};
+
+        protected function handleAssign(order:Object):void {
+            // TODO: implement assignment logic
+        }
+
+        protected function ordersGrid_selectionChange(event:GridSelectionEvent):void {
+            selectedOrder = ordersGrid.selectedItem;
+        }
+        ]]>
+    </fx:Script>
+</s:Application>
